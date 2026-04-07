@@ -176,3 +176,29 @@ button:hover {
 /* Color the low/high boxes */
 .stat-box.low .stat-value {color: #4ade80; }   /* green  */
 .stat-box.high .stat-value{ color: #f87171;}   /* green  */
+
+
+/* --- Deal Badges --- */
+.deal-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 99px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.deal-badge.good-deal {
+    background: #14532d;
+    color: #4ade80;
+}
+
+.deal-badge.overpriced {
+    background: #450a0a;
+    color: #f87171;
+}
+
+.deal-badge.fair {
+    background: #1e293b;
+    color: #94a3b8;
+}

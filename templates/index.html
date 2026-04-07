@@ -34,6 +34,16 @@
         {% if result.listings %}
     <div class="card results-card">
         <h2>Results for "{{ query | upper }}"</h2>
+    
+    <div class="trend-indicator {{result.trend}}"> 
+        {% if result.trend == "up" %}
+            ↑ Prices trending up
+        {% elif result.trend == "down" %}
+            ↓ Prices trending down
+        {% else %}
+            → Prices are stable
+        {% endif %}
+    </div>
 
         <div class="stats-row">
             <div class="stat-box">

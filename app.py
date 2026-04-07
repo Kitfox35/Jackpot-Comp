@@ -13,6 +13,26 @@ HARDWARE_PRICES = {
     "ryzen 7 7700x": [290, 310, 300],
 }
 
+def get_trend(prices):
+      
+   # Compare first half average vs second half average.
+    #Returns 'up', 'down', or 'stable'.
+    
+    if len(prices) < 2:
+        return "stable"
+
+    mid = len(prices) // 2
+    first_half = sum(prices[:mid]) / len(prices[:mid])
+    second_half = sum(prices[mid:]) / len(prices[mid:])
+
+    if second_half > first_half:
+        return "up"
+    elif second_half < first_half:
+        return "down"
+    else:
+        return "stable"
+
+
 def get_price_data(query):
     """Return prices and average for a given hardware inquiry."""
     query = query.strip().lower()
@@ -39,12 +59,16 @@ def get_price_data(query):
         else:
             lavel = "Fair"
         listings.append({"price": price, "label": label})
-        
+
+
+    trend = get_trend(prices)
+
     return {
         "listings": listings,  # replaces "prices"
         "avg": avg,
         "low": low,
         "high": high,
+        "trend": trend,
         "error": None,
     }
 
