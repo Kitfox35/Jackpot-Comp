@@ -6,56 +6,6 @@
     <title>RigRadar — PC Price Tracker</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-
-<script>
-    // --- Loading bar ---
-    document.getElementById('search-form').addEventListener('submit', function() {
-        document.getElementById('loader').classList.add('active');
-        document.querySelector('button[type="submit"]').disabled = true;
-        document.querySelector('button[type="submit"]').textContent = 'Searching...';
-    });
-
-    // --- Profit Calculator ---
-    const buyInput = document.getElementById('buy-price');
-    const sellInput = document.getElementById('sell-price');
-    const calcResult = document.getElementById('calc-result');
-
-    function updateCalc() {
-        const buy = parseFloat(buyInput.value);
-        const sell = parseFloat(sellInput.value);
-
-        if (isNaN(buy) || isNaN(sell)) {
-            calcResult.textContent = 'Enter buy and sell prices above';
-            calcResult.className = 'calc-result';
-            return;
-        }
-
-        const profit = sell - buy;
-        const percent = ((profit / buy) * 100).toFixed(1);
-
-        if (profit > 0) {
-            calcResult.innerHTML = `Profit: <span>+$${profit.toFixed(2)}</span> (${percent}%)`;
-            calcResult.className = 'calc-result positive';
-        } else if (profit < 0) {
-            calcResult.innerHTML = `Loss: <span>-$${Math.abs(profit).toFixed(2)}</span> (${percent}%)`;
-            calcResult.className = 'calc-result negative';
-        } else {
-            calcResult.innerHTML = `Break even`;
-            calcResult.className = 'calc-result';
-        }
-    }
-
-    buyInput.addEventListener('input', updateCalc);
-    sellInput.addEventListener('input', updateCalc);
-</script>
-
-
-
-
-
-
-
-
 <body>
     <div class="container">
         <header>
@@ -63,14 +13,14 @@
             <p class="tagline">Real-time PC hardware price tracking</p>
         </header>
 
-        <div class="loader" if="loader">
+        <div class="loader" id="loader">
             <div class="loader-bar"></div>
         </div>
 
-        <form method="POST" class id="search-form">
-            <input 
-                type="text" 
-                name="query" 
+        <form method="POST" class="search-form" id="search-form">
+            <input
+                type="text"
+                name="query"
                 placeholder="Search GPU or CPU (e.g. RTX 4070)"
                 title="Search GPU or CPU (e.g. RTX 4070)"
                 value="{{ query }}"
@@ -81,19 +31,19 @@
         </form>
 
         {% if history %}
-    <div class="history-bar">
-        <span class="history-label">Recent:</span>
-        {% for item in history %}
-            <button 
-                class="history-chip" 
-                type="button"
-                onclick="document.querySelector('input[name=query]').value='{{ item }}'; document.querySelector('form').submit();"
-            >
-                {{ item | upper }}
-            </button>
-        {% endfor %}
-    </div>
-{% endif %}
+            <div class="history-bar">
+                <span class="history-label">Recent:</span>
+                {% for item in history %}
+                    <button
+                        class="history-chip"
+                        type="button"
+                        onclick="document.querySelector('input[name=query]').value='{{ item }}'; document.querySelector('form').submit();"
+                    >
+                        {{ item | upper }}
+                    </button>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         {% if result.error %}
             <div class="card error-card">
@@ -102,87 +52,111 @@
         {% endif %}
 
         {% if result.listings %}
-    <div class="card results-card">
-        <h2>Results for "{{ query | upper }}"</h2>
-    
+            <div class="card results-card">
+                <h2>Results for "{{ query | upper }}"</h2>
 
-    <div class="card calc-card">
-        <h2 class="calc-title">Profit Calculator</h2>
-        <div class="calc-row">
-            <div class="calc-field">
-                <label for="buy-price">Buy Price ($)</label>
-                <input type="number" id="buy-price" placeholder="e.g. 480" min="0">
+                <div class="trend-indicator {{ result.trend }}">
+                    {% if result.trend == "up" %}
+                        ↑ Prices trending up
+                    {% elif result.trend == "down" %}
+                        ↓ Prices trending down
+                    {% else %}
+                        → Prices are stable
+                    {% endif %}
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <span class="stat-label">Average</span>
+                        <span class="stat-value">${{ result.avg }}</span>
+                    </div>
+                    <div class="stat-box low">
+                        <span class="stat-label">Lowest</span>
+                        <span class="stat-value">${{ result.low }}</span>
+                    </div>
+                    <div class="stat-box high">
+                        <span class="stat-label">Highest</span>
+                        <span class="stat-value">${{ result.high }}</span>
+                    </div>
+                </div>
+
+                <ul class="price-list">
+                    {% for listing in result.listings %}
+                        <li>
+                            <span class="listing-label">Listing {{ loop.index }}</span>
+                            <span class="listing-price">${{ listing.price }}</span>
+                            <span class="deal-badge {{ listing.label | lower | replace(' ', '-') }}">
+                                {{ listing.label }}
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ul>
             </div>
-            <div class="calc-field">
-                <label for="sell-price">Sell Price ($)</label>
-                <input type="number" id="sell-price" placeholder="e.g. 550" min="0">
-            </div>
-        </div>
-        <div class="calc-result" id="calc-result">
-            Enter buy and sell prices above
-        </div>
-    </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    </div>
-    
-
-
-
-
-
-
-    <div class="trend-indicator {{result.trend}}"> 
-        {% if result.trend == "up" %}
-            ↑ Prices trending up
-        {% elif result.trend == "down" %}
-            ↓ Prices trending down
-        {% else %}
-            → Prices are stable
         {% endif %}
-    </div>
 
-        <div class="stats-row">
-            <div class="stat-box">
-                <span class="stat-label">Average</span>
-                <span class="stat-value">${{ result.avg }}</span>
+        <div class="card calc-card">
+            <h2 class="calc-title">Profit Calculator</h2>
+            <div class="calc-row">
+                <div class="calc-field">
+                    <label for="buy-price">Buy Price ($)</label>
+                    <input type="number" id="buy-price" placeholder="e.g. 480" min="0">
+                </div>
+                <div class="calc-field">
+                    <label for="sell-price">Sell Price ($)</label>
+                    <input type="number" id="sell-price" placeholder="e.g. 550" min="0">
+                </div>
             </div>
-            <div class="stat-box low">
-                <span class="stat-label">Lowest</span>
-                <span class="stat-value">${{ result.low }}</span>
-            </div>
-            <div class="stat-box high">
-                <span class="stat-label">Highest</span>
-                <span class="stat-value">${{ result.high }}</span>
+            <div class="calc-result" id="calc-result">
+                Enter buy and sell prices above
             </div>
         </div>
 
-        <ul class="price-list">
-            {% for listing in result.listings %}
-                <li>
-                <span class="listing-label">Listing {{ loop.index }}</span>
-                <span class="listing-price">${{ listing.price }}</span>
-                <span class="deal-badge {{ listing.label | lower | replace(' ', '-') }}">
-                    
-                    {{ listing.label }}
-                </span>
-            </li>
-        {% endfor %}
-    </ul>
     </div>
-{% endif %}
+
+    <script>
+        // --- Loading bar ---
+        document.getElementById('search-form').addEventListener('submit', function() {
+            document.getElementById('loader').classList.add('active');
+            document.querySelector('button[type="submit"]').disabled = true;
+            document.querySelector('button[type="submit"]').textContent = 'Searching...';
+        });
+
+        // --- Profit Calculator ---
+        const buyInput = document.getElementById('buy-price');
+        const sellInput = document.getElementById('sell-price');
+        const calcResult = document.getElementById('calc-result');
+
+        function updateCalc() {
+            if (!buyInput || !sellInput || !calcResult) return;
+
+            const buy = parseFloat(buyInput.value);
+            const sell = parseFloat(sellInput.value);
+
+            if (isNaN(buy) || isNaN(sell)) {
+                calcResult.textContent = 'Enter buy and sell prices above';
+                calcResult.className = 'calc-result';
+                return;
+            }
+
+            const profit = sell - buy;
+            const percent = ((profit / buy) * 100).toFixed(1);
+
+            if (profit > 0) {
+                calcResult.innerHTML = `Profit: <span>+$${profit.toFixed(2)}</span> (${percent}%)`;
+                calcResult.className = 'calc-result positive';
+            } else if (profit < 0) {
+                calcResult.innerHTML = `Loss: <span>-$${Math.abs(profit).toFixed(2)}</span> (${percent}%)`;
+                calcResult.className = 'calc-result negative';
+            } else {
+                calcResult.innerHTML = `Break even`;
+                calcResult.className = 'calc-result';
+            }
+        }
+
+        if (buyInput && sellInput) {
+            buyInput.addEventListener('input', updateCalc);
+            sellInput.addEventListener('input', updateCalc);
+        }
+    </script>
+</body>
+</html>
