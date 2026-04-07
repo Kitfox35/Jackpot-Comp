@@ -29,9 +29,19 @@ def get_price_data(query):
     avg =round(sum(prices) / len (prices), 2)
     low = min(prices)
     high = max(prices)
-    
+    # Build labeled listings
+    listings = []
+    for price in prices :
+        if price < avg:
+            label = "Good Deal"
+        elif price > avg:
+            label = "Overpriced"
+        else:
+            lavel = "Fair"
+        listings.append({"price": price, "label": label})
+        
     return {
-        "prices": prices,
+        "listings": listings,  # replaces "prices"
         "avg": avg,
         "low": low,
         "high": high,
@@ -47,9 +57,9 @@ def home():
 
     if request.method == "POST":
         query = request.form.get("query", "")
-        prices, avg, error = get_price_data(query)
+        result = get_price_data(query)
 
-    return render_template("index.html", prices=prices, avg=avg, error=error,query=query)
+    return render_template("index.html", result=result, query=query)
 
 if __name__ == "__main__":
     app.run(debug=True)

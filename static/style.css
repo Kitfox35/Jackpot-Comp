@@ -140,3 +140,39 @@ button:hover {
     font-weight: 600;
     color: #e2e8f0;
 }
+
+/* --- Stats Row --- */
+.stats-row{
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stat-box {
+    flex: 1;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 14px 12px;
+    text-align: center;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.75rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.8em;
+    margin-bottom: 6px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #f1f5f9;
+}
+
+/* Color the low/high boxes */
+.stat-box.low .stat-value {color: #4ade80; }   /* green  */
+.stat-box.high .stat-value{ color: #f87171;}   /* green  */

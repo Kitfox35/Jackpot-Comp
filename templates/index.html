@@ -26,16 +26,16 @@
         </form>
 
         {% if result.error %}
-            <div>class="card error-card"</div>
+            <div class="card error-card">
                 <p> {{ result.error }}</p>
             </div>
         {% endif %}
 
-        {% if result.prices %}
-            <div> class="card results-card"</div>
-                <h2>Rusults for "{{ query | upper }}"</h2>
+        {% if result.listings %}
+    <div class="card results-card">
+        <h2>Results for "{{ query | upper }}"</h2>
 
-                <div class="stats-row">
+        <div class="stats-row">
             <div class="stat-box">
                 <span class="stat-label">Average</span>
                 <span class="stat-value">${{ result.avg }}</span>
@@ -51,12 +51,16 @@
         </div>
 
         <ul class="price-list">
-            {% for price in result.prices %}
+            {% for listing in result.listings %}
                 <li>
-                    <span class="listing-label">Listing {{ loop.index }}</span>
-                    <span class="listing-price">${{ price }}</span>
-                </li>
-            {% endfor %}
-        </ul>
+                <span class="listing-label">Listing {{ loop.index }}</span>
+                <span class="listing-price">${{ listing.price }}</span>
+                <span class="deal-badge {{ listing.label | lower | replace(' ', '-') }}">
+                    
+                    {{ listing.label }}
+                </span>
+            </li>
+        {% endfor %}
+    </ul>
     </div>
 {% endif %}
