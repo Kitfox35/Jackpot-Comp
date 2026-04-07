@@ -37,14 +37,23 @@ def get_price_data(query):
     """Return prices and average for a given hardware inquiry."""
     query = query.strip().lower()
 
+        # Case 1: empty submission
     if not query:
-        return{"error" : "Please enter a search term."}
+        return {"error": "Enter a GPU or CPU name to get started."}
+
+    if len(query) < 3:
+        return {"error": f'"{query}" is too short. Try something like "RTX 4070" of i& 12700k.'}
+
+
+        # Case 3: no match found — show suggestions
+
     prices = HARDWARE_PRICES.get(query)
+
+    # Case 3: no match found — show suggestions
     if prices is None:
-        suggestions = ",".join(
-            k.upper() for k in list(HARDWARE_PRICES.keys()) [:4]
-        )
-        return{"error": f'No results for "{query}". Try: {suggestions}'}
+        suggestions = [k.upper() for k in HARDWARE_PRICES.keys()]
+        suggestions_str = ", ".join(suggestions)
+        return {"error": f'No results for "{query.upper()}". Available parts: {suggestions_str}'}
     
     avg =round(sum(prices) / len (prices), 2)
     low = min(prices)

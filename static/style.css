@@ -90,8 +90,14 @@ button:hover {
 }
 
 .error-card {
-    border-color: #ef4444;
+    border-color: #f87171;
     color: #fca5a5;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.error-card p {
+    margin: 0;
 }
 
 /* --- Results --- */
@@ -199,6 +205,29 @@ button:hover {
 }
 
 .deal-badge.fair {
+    background: #1e293b;
+    color: #94a3b8;
+}
+
+/* --- Trend Indicator --- */
+.trend-indicator {
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+}
+
+.trend-indicator.up {
+    background: #450a0a;
+}
+
+.trend-indicator.down {
+    background: #14532d;
+}
+
+.trend-indicator.stable {
     background: #1e293b;
     color: #94a3b8;
 }
