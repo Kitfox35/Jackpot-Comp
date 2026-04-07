@@ -304,11 +304,89 @@ button:hover {
 }
 
 input[type="text"]::placeholder {
-    overflow: hidden
-    text-overflow; ellipsis;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 input[type="text"]:focus::placeholder {
     color: transparent;
+}
+
+/* --- Profit Calculator --- */
+.calc-card {
+    margin-top: 16px;
+}
+
+.calc-title {
+    font-size: 1rem;
+    color: #94a3b8;
+    font-weight: 500;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.calc-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.calc-field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.calc-field label {
+    font-size: 0.8rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.calc-field input {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    background: #0f172a;
+    color: #f1f5f9;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+}
+
+.calc-field input:focus {
+    border-color: #3b82f6;
+}
+
+.calc-result {
+    text-align: center;
+    padding: 14px;
+    border-radius: 8px;
+    background: #0f172a;
+    color: #64748b;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.calc-result.positive {
+    color: #4ade80;
+    background: #14532d22;
+}
+
+.calc-result.calc-result.positive span{
+    font-weight: 700;
+}
+
+.calc-result.negative {
+    color: #f87171;
+    background: #450a0a22;
+}
+
+.calc-result.negative span {
+    font-weight: 700;
 }
