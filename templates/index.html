@@ -2,15 +2,25 @@
 <html>
 <head>
     <title>RigRadar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <h1>RigRadar</h1>
 
-     <form>
-        <input type="text" placeholder="Search GPU or CPU">
+     <form method="POST">
+        <input type="text" name="query" placeholder="Search GPU or CPU">
         <button type="submit">Search</button>
     </form>
 
-    <p>Website is loading correctly.</p>
+   {% if result %}
+        <h2>Average Price: ${{ avg }}</h2>
+    {% endif %}
+
+    <ul>
+        {% for item in results %}
+            <li> {{ item }}</li>
+            {% endfor %}
+
+    </ul>
 </body>
 </html>

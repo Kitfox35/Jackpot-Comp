@@ -1,15 +1,47 @@
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
+#--- Data layer ---
+# Later, this gets replaced by an API call
+HARDWARE_PRICES = {
+    "rtx 4070": [520, 550, 500],
+    "rtx 4080": [700, 720, 710],
+    "rx 7800 xt": [480, 510, 495],
+    "rx 7900 xt": [600, 620, 590],
+    "i7 12700k": [300, 320, 310],
+    "i9 13900k": [550, 580, 560],
+    "ryzen 7 7700x": [290, 310, 300],
+}
+
+def get_price_data(query):
+    """Return prices and average for a given hardware inquiry."""
+    query = query.strip().lower()
+
+    if not query:
+        return None, None, "Please enter a search term."
+    prices = HARDWARE_PRICES.get(query)
+    if prices is None:
+        return None,None, f'No data found "{query}". Try: RTX 4070, RX 7800XT, i7 12700K'
+    
+    avg =round(sum(prices) / len (prices), 2)
+    return prices, avg, None
+
+
+# --- Routes ---
 
 @app.route("/", methods=["GET", "POST"])
 def home():
-    result = None
+    prices = []
+    avg = None
+    error = None
+    query = ""
 
-    if request.method == ("POST"):
-        query = request.form["query"]
-        result = f"You searched for: {query}"
-    return render_template("index.html", result=result)
+    if request.method == "POST":
+        query = request.form.get("query", "")
+        prices, avg, error = get_price_data(query)
+
+    return render_template("index.html", prices=prices, avg=avg, error=error,query=query)
 
 if __name__ == "__main__":
     app.run(debug=True)
+    
