@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session
 
 app = Flask(__name__)
+app.secret_key = "rigradar-dev-key" # Note to self: change this to something random before deploying
 #--- Data layer ---
 # Later, this gets replaced by an API call
 HARDWARE_PRICES = {
@@ -88,11 +89,28 @@ def home():
     result = {}
     query = ""
 
+    # Initialize history list if first visit
+    if "history" not in session:
+        session["history"] = []
+
     if request.method == "POST":
-        query = request.form.get("query", "")
+        query = request.form.get("query", "").strip()
         result = get_price_data(query)
 
-    return render_template("index.html", result=result, query=query)
+        # Only save to history if it was a valid search
+        if not result.get("error") and query:
+            history = session["history"]
+
+            # Remove duplicate if it already exists
+            if query.lower() in history:
+                history.remove(query.lower())
+
+            # Add to front of list, keep max 5
+            history.insert(0, query.lower())
+            session["history"] = history[:5]
+            session.modified = True
+
+    return render_template("index.html", result=result, query=query, history=session["history"])
 
 if __name__ == "__main__":
     app.run(debug=True)

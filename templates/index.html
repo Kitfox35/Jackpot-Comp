@@ -25,6 +25,21 @@
             <button type="submit">Search</button>
         </form>
 
+        {% if history %}
+    <div class="history-bar">
+        <span class="history-label">Recent:</span>
+        {% for item in history %}
+            <button 
+                class="history-chip" 
+                type="button"
+                onclick="document.querySelector('input[name=query]').value='{{ item }}'; document.querySelector('form').submit();"
+            >
+                {{ item | upper }}
+            </button>
+        {% endfor %}
+    </div>
+{% endif %}
+
         {% if result.error %}
             <div class="card error-card">
                 <p>⚠ {{ result.error }}</p>
