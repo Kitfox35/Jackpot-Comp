@@ -1,4 +1,7 @@
+from dotenv import load_dotenv
+load_dotenv()
 from flask import Flask, render_template, request, session
+from ebay_api import search_prices
 
 app = Flask(__name__)
 app.secret_key = "rigradar-dev-key" # Note to self: change this to something random before deploying
@@ -48,7 +51,13 @@ def get_price_data(query):
 
         # Case 3: no match found — show suggestions
 
-    prices = HARDWARE_PRICES.get(query)
+    # Try real API first, fall back to hardcoded data
+    api_results = search_prices(query)
+
+    if api_results:
+        prices = [item["price"] for item in api_results]
+    else:
+        prices = HARDWARE_PRICES.get(query)
 
     # Case 3: no match found — show suggestions
     if prices is None:
