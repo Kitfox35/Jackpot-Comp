@@ -6,6 +6,22 @@
     <title>RigRadar — PC Price Tracker</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
+<script>
+     document.getElementById('search-form').addEventListener('submit', function() {
+        document.getElementById('loader').classList.add('active');
+        document.querySelector('button[type="submit"]').disabled = true;
+        document.querySelector('button[type="submit"]').textContent = 'Searching...';
+    });
+</script>
+
+
+
+
+
+
+
+
 <body>
     <div class="container">
         <header>
@@ -13,7 +29,11 @@
             <p class="tagline">Real-time PC hardware price tracking</p>
         </header>
 
-        <form method="POST" class="search-form">
+        <div class="loader" if="loader">
+            <div class="loader-bar"></div>
+        </div>
+
+        <form method="POST" class id="search-form">
             <input 
                 type="text" 
                 name="query" 
