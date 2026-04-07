@@ -1,26 +1,62 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>RigRadar</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RigRadar — PC Price Tracker</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>RigRadar</h1>
+    <div class="container">
+        <header>
+            <h1>RigRadar</h1>
+            <p class="tagline">Real-time PC hardware price tracking</p>
+        </header>
 
-     <form method="POST">
-        <input type="text" name="query" placeholder="Search GPU or CPU">
-        <button type="submit">Search</button>
-    </form>
+        <form method="POST" class="search-form">
+            <input 
+                type="text" 
+                name="query" 
+                placeholder="Search GPU or CPU (e.g. RTX 4070)"
+                value="{{ query }}"
+                autocomplete="off"
+                autofocus
+            >
+            <button type="submit">Search</button>
+        </form>
 
-   {% if result %}
-        <h2>Average Price: ${{ avg }}</h2>
-    {% endif %}
+        {% if result.error %}
+            <div>class="card error-card"</div>
+                <p> {{ result.error }}</p>
+            </div>
+        {% endif %}
 
-    <ul>
-        {% for item in results %}
-            <li> {{ item }}</li>
+        {% if result.prices %}
+            <div> class="card results-card"</div>
+                <h2>Rusults for "{{ query | upper }}"</h2>
+
+                <div class="stats-row">
+            <div class="stat-box">
+                <span class="stat-label">Average</span>
+                <span class="stat-value">${{ result.avg }}</span>
+            </div>
+            <div class="stat-box low">
+                <span class="stat-label">Lowest</span>
+                <span class="stat-value">${{ result.low }}</span>
+            </div>
+            <div class="stat-box high">
+                <span class="stat-label">Highest</span>
+                <span class="stat-value">${{ result.high }}</span>
+            </div>
+        </div>
+
+        <ul class="price-list">
+            {% for price in result.prices %}
+                <li>
+                    <span class="listing-label">Listing {{ loop.index }}</span>
+                    <span class="listing-price">${{ price }}</span>
+                </li>
             {% endfor %}
-
-    </ul>
-</body>
-</html>
+        </ul>
+    </div>
+{% endif %}

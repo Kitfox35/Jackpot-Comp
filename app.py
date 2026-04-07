@@ -18,22 +18,31 @@ def get_price_data(query):
     query = query.strip().lower()
 
     if not query:
-        return None, None, "Please enter a search term."
+        return{"error" : "Please enter a search term."}
     prices = HARDWARE_PRICES.get(query)
     if prices is None:
-        return None,None, f'No data found "{query}". Try: RTX 4070, RX 7800XT, i7 12700K'
+        suggestions = ",".join(
+            k.upper() for k in list(HARDWARE_PRICES.keys()) [:4]
+        )
+        return{"error": f'No results for "{query}". Try: {suggestions}'}
     
     avg =round(sum(prices) / len (prices), 2)
-    return prices, avg, None
-
+    low = min(prices)
+    high = max(prices)
+    
+    return {
+        "prices": prices,
+        "avg": avg,
+        "low": low,
+        "high": high,
+        "error": None,
+    }
 
 # --- Routes ---
 
 @app.route("/", methods=["GET", "POST"])
 def home():
-    prices = []
-    avg = None
-    error = None
+    result = {}
     query = ""
 
     if request.method == "POST":
