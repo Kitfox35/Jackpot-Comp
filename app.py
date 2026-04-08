@@ -44,24 +44,27 @@ def get_price_data(query):
         # Case 1: empty submission
     if not query:
         return {"error": "Enter a GPU or CPU name to get started."}
-
+        # Case 2: too short
     if len(query) < 3:
         return {"error": f'"{query}" is too short. Try something like "RTX 4070" of i& 12700k.'}
 
-
-        # Case 3: no match found — show suggestions
-
-    # Try real API first, fall back to hardcoded data
+    # Fetch from eBay API
     api_results = search_prices(query)
 
-# Build labeled listings
-    listings = []
+    # Case 3: no results returned
+    if not api_results:
+        suggestions = "RTX 4070, RTX 3080, RX 7800XT, i712700K"
+        return {"error": f'No results for "{query.upper()}". Try: {suggestions}'}
+
+    #Build stats
     prices = [item["price"] for item in api_results]
     avg = round(sum(prices) / len(prices), 2)
     low = min(prices)
     high = max(prices)
     trend = get_trend(prices)
-    
+
+# Build labeled listings
+    listings = []
     for item in api_results :
         price = item["price"]
         if price < avg:
@@ -77,15 +80,8 @@ def get_price_data(query):
         "url": item.get("url", "#")
     })
 
-
-
-
-
-
-    trend = get_trend(prices)
-
     return {
-        "listings": listings,  # replaces "prices"
+        "listings": listings, 
         "avg": avg,
         "low": low,
         "high": high,

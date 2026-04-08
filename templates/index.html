@@ -136,131 +136,133 @@
     </div>
 
     <script>
-    const resultAvg = parseFloat(document.querySelector('.calc-card').dataset.avg) || 0;
+        const resultAvg = parseFloat(document.querySelector('.calc-card').dataset.avg) || 0;
 
-    // --- Loading bar ---
-    document.getElementById('search-form').addEventListener('submit', function() {
-        document.getElementById('loader').classList.add('active');
-        document.querySelector('button[type="submit"]').disabled = true;
-        document.querySelector('button[type="submit"]').textContent = 'Searching...';
-    });
+        // --- Loading bar ---
+        document.getElementById('search-form').addEventListener('submit', function() {
+            document.getElementById('loader').classList.add('active');
+            document.querySelector('button[type="submit"]').disabled = true;
+            document.querySelector('button[type="submit"]').textContent = 'Searching...';
+        });
 
-    // --- Autocomplete ---
-    const PARTS = [
-    "RTX 5090", "RTX 5080", "RTX 5070 Ti", "RTX 5070", "RTX 5060", "RTX 5050",
-    "RTX 4090", "RTX 4080", "RTx 4070 Ti", "RTX 4070", "RTX 4060 Ti", "RTX 4060", "RTX 3090",
-    "RTX 3080", "RTX 3070 Ti", "RTX 3070", "RTX 3060 Ti", "RTX 3060", "RTX 3050", "RX 7900XTX", "RX 7900XT",
-    "RX 7800XT", "RX 7700XT", "RX 6800XT", "RX 6700XT", "RX 6600XT", "RX 6600", "i9 14900K", 
-    "i9 13900K", "i7 14700K", "i7 13700K","i7 12700K", "i5 13600K", "i5 12600K","Ryzen 9 7950X", "Ryzen 9 7900X", "Ryzen 7 7700X",
-    "Ryzen 7 5800X", "Ryzen 5 7600X", "Ryzen 5 5600X", "Ryzen 5 5500", "Ryzen 5 3600", "Ryzen 5 5800x3d"
-    ];
+        // --- Autocomplete ---
+        const PARTS = [
+            "RTX 5090", "RTX 5080", "RTX 5070 Ti", "RTX 5070", "RTX 5060", "RTX 5050",
+            "RTX 4090", "RTX 4080", "RTX 4070 Ti", "RTX 4070", "RTX 4060 Ti", "RTX 4060",
+            "RTX 3090", "RTX 3080", "RTX 3070 Ti", "RTX 3070", "RTX 3060 Ti", "RTX 3060", "RTX 3050",
+            "RX 7900 XTX", "RX 7900 XT", "RX 7800 XT", "RX 7700 XT",
+            "RX 6800 XT", "RX 6700 XT", "RX 6600 XT", "RX 6600",
+            "i9 14900K", "i9 13900K", "i7 14700K", "i7 13700K", "i7 12700K", "i5 13600K", "i5 12600K",
+            "Ryzen 9 7950X", "Ryzen 9 7900X", "Ryzen 7 7700X",
+            "Ryzen 7 5800X", "Ryzen 5 7600X", "Ryzen 5 5600X", "Ryzen 5 5500", "Ryzen 5 3600"
+        ];
 
         const searchInput = document.getElementById('search-input');
         const suggestionsList = document.getElementById('suggestions');
 
-        searchInput.addEventListener('input', function(){
+        searchInput.addEventListener('input', function() {
             const val = this.value.trim().toLowerCase();
             suggestionsList.innerHTML = '';
-            if (!val || val.length < 2) returns;
+            if (!val || val.length < 2) return;  // was "returns" — typo
 
-            const matches = PARTS.filter(p => p.toLowerCase().includes(val)).slice(0,6);
-            matches.forEach(matche => {
+            const matches = PARTS.filter(p => p.toLowerCase().includes(val)).slice(0, 6);
+            matches.forEach(match => {  // was "matche" — typo
                 const li = document.createElement('li');
-                li.textContent = match;
-                li.addEventListener('mousedown', function() {
+                li.textContent = match;  // was "match" inside forEach with wrong param name
+                li.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
                     searchInput.value = match;
                     suggestionsList.innerHTML = '';
                     document.getElementById('search-form').submit();
-                })
+                });
                 suggestionsList.appendChild(li);
-            })
-        })
+            });
+        });
 
         document.addEventListener('click', function(e) {
-            if (!e.target.closest('.autocomplete-wrapper')){
+            if (!e.target.closest('.autocomplete-wrapper')) {
                 suggestionsList.innerHTML = '';
             }
-        })
+        });
 
-    searchInput.addEventListener('keydown', function(e) {
-        const items = suggestionsList.querySelectorAll('li');
-        const active = suggestionsList.querySelectorAll('li.active');
+        searchInput.addEventListener('keydown', function(e) {
+            const items = suggestionsList.querySelectorAll('li');
+            const active = suggestionsList.querySelector('li.active');  // was querySelectorAll — returns array not single element
 
-        if (e.key == 'ArrowDown') {
-            e.preventDefault();
-            if (!active) {
-                items[0]?.classList.add('active');
-            } else{
-                active.classList.remove('active');
-                active.nextElementSibling?.classList.add('active');
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (!active) {
+                    items[0]?.classList.add('active');
+                } else {
+                    active.classList.remove('active');
+                    active.nextElementSibling?.classList.add('active');
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (active) {
+                    active.classList.remove('active');
+                    active.previousElementSibling?.classList.add('active');
+                }
+            } else if (e.key === 'Enter' && active) {
+                e.preventDefault();
+                searchInput.value = active.textContent;
+                suggestionsList.innerHTML = '';
+                document.getElementById('search-form').submit();
+            } else if (e.key === 'Escape') {
+                suggestionsList.innerHTML = '';
             }
-        } else if (e.key === 'ArrowUp'){
-            e.preventDefault();
-            if (active) {
-                active.classList.remove('active');
-                active.previousElementSibling?.classList.add('active');
+        });
+
+        // --- Profit Calculator ---
+        const buyInput = document.getElementById('buy-price');
+        const sellInput = document.getElementById('sell-price');
+        const calcResult = document.getElementById('calc-result');
+
+        function updateCalc() {
+            if (!buyInput || !sellInput || !calcResult) return;
+
+            const buy = parseFloat(buyInput.value);
+            const sell = parseFloat(sellInput.value);
+
+            if (isNaN(buy) || isNaN(sell)) {
+                calcResult.textContent = 'Enter buy and sell prices above';
+                calcResult.className = 'calc-result';
+                return;
             }
-        } else if (e.key === 'Enter'&& active) {
-            e.preventDefault();
-            searchInput.value = active.textContent;
-            suggestionsList.innerHTML = '';
-            document.getElementById('search-form').submit();
-        } else if (e.key === 'Escape') {
-            suggestionsList.innerHTML = '';
-        }
-    });
 
-    // --- Profit Calculator ---
-    const buyInput = document.getElementById('buy-price');
-    const sellInput = document.getElementById('sell-price');
-    const calcResult = document.getElementById('calc-result');
+            const profit = sell - buy;
+            const percent = ((profit / buy) * 100).toFixed(1);
 
-    function updateCalc() {
-        if (!buyInput || !sellInput || !calcResult) return;
-
-        const buy = parseFloat(buyInput.value);
-        const sell = parseFloat(sellInput.value);
-
-        if (isNaN(buy) || isNaN(sell)) {
-            calcResult.textContent = 'Enter buy and sell prices above';
-            calcResult.className = 'calc-result';
-            return;
-        }
-
-        const profit = sell - buy;
-        const percent = ((profit / buy) * 100).toFixed(1);
-
-        if (profit > 0) {
-            calcResult.innerHTML = `Profit: <span>+$${profit.toFixed(2)}</span> (${percent}%)`;
-            calcResult.className = 'calc-result positive';
-        } else if (profit < 0) {
-            calcResult.innerHTML = `Loss: <span>-$${Math.abs(profit).toFixed(2)}</span> (${percent}%)`;
-            calcResult.className = 'calc-result negative';
-        } else {
-            calcResult.innerHTML = `Break even`;
-            calcResult.className = 'calc-result';
-        }
-
-        // Compare sell price to market average
-        const avgCompare = document.getElementById('avg-compare');
-        if (avgCompare && resultAvg > 0 && !isNaN(sell)) {
-            if (sell > resultAvg) {
-                avgCompare.textContent = `Sell price is $${(sell - resultAvg).toFixed(2)} above market average`;
-                avgCompare.className = 'avg-compare above';
-            } else if (sell < resultAvg) {
-                avgCompare.textContent = `Sell price is $${(resultAvg - sell).toFixed(2)} below market average`;
-                avgCompare.className = 'avg-compare below';
+            if (profit > 0) {
+                calcResult.innerHTML = `Profit: <span>+$${profit.toFixed(2)}</span> (${percent}%)`;
+                calcResult.className = 'calc-result positive';
+            } else if (profit < 0) {
+                calcResult.innerHTML = `Loss: <span>-$${Math.abs(profit).toFixed(2)}</span> (${percent}%)`;
+                calcResult.className = 'calc-result negative';
             } else {
-                avgCompare.textContent = `Sell price matches market average`;
-                avgCompare.className = 'avg-compare equal';
+                calcResult.innerHTML = `Break even`;
+                calcResult.className = 'calc-result';
+            }
+
+            const avgCompare = document.getElementById('avg-compare');
+            if (avgCompare && resultAvg > 0 && !isNaN(sell)) {
+                if (sell > resultAvg) {
+                    avgCompare.textContent = `Sell price is $${(sell - resultAvg).toFixed(2)} above market average`;
+                    avgCompare.className = 'avg-compare above';
+                } else if (sell < resultAvg) {
+                    avgCompare.textContent = `Sell price is $${(resultAvg - sell).toFixed(2)} below market average`;
+                    avgCompare.className = 'avg-compare below';
+                } else {
+                    avgCompare.textContent = `Sell price matches market average`;
+                    avgCompare.className = 'avg-compare equal';
+                }
             }
         }
-    }
 
-    if (buyInput && sellInput) {
-        buyInput.addEventListener('input', updateCalc);
-        sellInput.addEventListener('input', updateCalc);
-    }
+        if (buyInput && sellInput) {
+            buyInput.addEventListener('input', updateCalc);
+            sellInput.addEventListener('input', updateCalc);
+        }
 </script>
 </body>
 </html>
