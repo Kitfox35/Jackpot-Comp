@@ -605,3 +605,35 @@ input[type="text"]:focus::placeholder {
     background: #0f172a;
     color: #f1f5f9;
 }
+
+/* --- List Controls --- */
+.list-controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.control-group label {
+    font-size: 0.8rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.control-group select {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    background: #1e293b;
+    color: #e2e8f0;
+    font-size: 0.85rem;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.control-group select:form {
+    border-color: #3b82f6
+}

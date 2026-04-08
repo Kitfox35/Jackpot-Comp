@@ -66,6 +66,25 @@
             <div class="card results-card">
                 <h2>Results for "{{ query | upper }}"</h2>
 
+                <div class="list-controls">
+                    <div class="control-group">
+                        <label>Sort</label>
+                        <select id="sort-select">
+                            <option value="default">Default</option>
+                            <option value="low-high">Price: Low to High</option>
+                            <option value="high-low"> Price: High to Low</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Filter</label>
+                        <select id="filter-select">
+                            <option value="all">All Listings</option>
+                            <option value="good-deal">Good Deal Only</option>
+                            <option value="overpriced">Overpriced Only</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="trend-indicator {{ result.trend }}">
                     {% if result.trend == "up" %}
                         ↑ Prices trending up
@@ -212,6 +231,51 @@
                 suggestionsList.innerHTML = '';
             }
         });
+
+        // --- Filter & Sort ---
+        const sortSelect = document.getElementById('sort-select');
+        const filterSelect = document.getElementById('filter-select');
+        const priceList = document.querySelector('.price-list');
+
+        function applyControls() {
+            if (!priceList) return;
+
+            const items = Array.from(priceList.querySelectorAll('li'));
+            const sortVal = sortSelect.value;
+            const filterVal = filterSelect.value;
+
+            // Filter
+            items.forEach(item => {
+                const badge = item.querySelector('.deal-badge');
+                if (!badge) return;
+
+                const label = badge.className.split(' ').find(c => ['good-deal', 'overpriced', 'fair'].includes(c)); // "good-deal", "overpriced", "fair"
+
+                if (filterVal === 'all' || label === filterVal) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            })
+            
+            // Sort
+            const visibleItems = items.filter(i => i.style.display !== 'none');
+
+            visibleItems.sort((a, b) => {
+                const priceA = parseFloat(a.querySelector('.listing-price').textContent.replace('$', ''));
+                const priceB = parseFloat(b.querySelector('.listing-price').textContent.replace('$', ''));
+                if (sortVal === 'low-high') return priceA - priceB;
+                if (sortVal === 'high-low') return priceB - priceA;
+                return 0;
+            });
+
+            visibleItems.forEach(item => priceList.appendChild(item));
+        }
+
+        if (sortSelect && filterSelect) {
+            sortSelect.addEventListener('change', applyControls);
+            filterSelect.addEventListener('change', applyControls);
+        }
 
         // --- Profit Calculator ---
         const buyInput = document.getElementById('buy-price');
