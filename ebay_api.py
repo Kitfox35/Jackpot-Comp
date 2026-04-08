@@ -9,6 +9,11 @@ import os
 APP_ID = os.environ.get("EBAY_APP_ID")
 CERT_ID = os.environ.get("EBAY_CERT_ID")
 
+# --- Results cache ---
+_results_cache = {}
+CACHE_DURATION = 30 * 60 # 30 minutes in seconds
+
+
 # --- Token cache (so we don't fetch a new token every search) ---
 _token_cache = {
     "token": None,
@@ -51,8 +56,19 @@ def get_access_token():
 def search_prices(query, limit=10):
     """
     Search eBay for a hardware item and return a list of prices.
-    Returns a list of dicts: [{"price": 520.0, "title": "...", "url": "..."}]
+    Returns cached results if the same query was made within 30 minutes.
+
     """
+    cache_key = query.strip().lower()
+    now = time.time()
+     
+    # Return cached result if still fresh
+    if cache_key in _results_cache:
+        cached = _results_cache[cache_key]
+        if now - cached ["timestamp"] < CACHE_DURATION:
+            return cached["data"]
+
+    # Otherwise fetch from eBay
     token = get_access_token()
 
     response = requests.get(
