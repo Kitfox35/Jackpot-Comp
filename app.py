@@ -125,10 +125,11 @@ def home():
 
 @app.route("/compare", methods=["GET", "POST"])
 def compare():
+    print("COMPARE ROUTE HIT")
     result_a = {}
     result_b = {}
-    query_a = {}
-    query_b = {}
+    query_a = ""
+    query_b = ""
     winner = None
 
     if request.method == "POST":
@@ -147,6 +148,10 @@ def compare():
                 winner = "b"
             else:
                 winner = "tie"
+# TEMP FOR TESTIING
+    print(f"query_a={query_a}, query_b={query_b}")
+    
+    
     return render_template("compare.html",
         result_a=result_a, result_b=result_b,
         query_a=query_a, query_b=query_b,

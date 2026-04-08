@@ -9,10 +9,14 @@
 <body>
     <div class="container compare-container">
         <header>
-            <a href="/" class="back-link">← Back to Search</a>
             <h1>RigRadar</h1>
             <p class="tagline">Compare PC hardware prices</p>
         </header>
+
+        <a href="/" class="nav-btn nav-btn-back">
+            <span class="nav-btn-arrow">←</span>
+            <span class="nav-btn-text">Back to Search</span>
+        </a>
 
         <form method="POST" class="compare-form" id="compare-form">
             <div class="compare-inputs">
@@ -32,7 +36,7 @@
                     autocomplete="off"
                 >
             </div>
-            <button type="submit">Compare</button>
+            <button type="submit" class="compare-btn">Compare</button>
         </form>
 
         {% if winner %}
@@ -60,13 +64,9 @@
                         <h2>{{ query_a | upper }}</h2>
 
                         <div class="trend-indicator {{ result_a.trend }}">
-                            {% if result_a.trend == "up" %}
-                                ↑ Prices trending up
-                            {% elif result_a.trend == "down" %}
-                                ↓ Prices trending down
-                            {% else %}
-                                → Prices are stable
-                            {% endif %}
+                            {% if result_a.trend == "up" %}↑ Prices trending up
+                            {% elif result_a.trend == "down" %}↓ Prices trending down
+                            {% else %}→ Prices are stable{% endif %}
                         </div>
 
                         <div class="stats-row">
@@ -114,13 +114,9 @@
                         <h2>{{ query_b | upper }}</h2>
 
                         <div class="trend-indicator {{ result_b.trend }}">
-                            {% if result_b.trend == "up" %}
-                                ↑ Prices trending up
-                            {% elif result_b.trend == "down" %}
-                                ↓ Prices trending down
-                            {% else %}
-                                → Prices are stable
-                            {% endif %}
+                            {% if result_b.trend == "up" %}↑ Prices trending up
+                            {% elif result_b.trend == "down" %}↓ Prices trending down
+                            {% else %}→ Prices are stable{% endif %}
                         </div>
 
                         <div class="stats-row">
@@ -162,8 +158,9 @@
 
     <script>
         document.getElementById('compare-form').addEventListener('submit', function() {
-            document.querySelector('button[type="submit"]').disabled = true;
-            document.querySelector('button[type="submit"]').textContent = 'Comparing...';
+            const btn = document.querySelector('.compare-btn');
+            btn.disabled = true;
+            btn.textContent = 'Comparing...';
         });
     </script>
 </body>
