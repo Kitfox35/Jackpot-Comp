@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RigRadar — Compare Parts</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container compare-container">
+        <header>
+            <a href="/" class="back-link">← Back to Search</a>
+            <h1>RigRadar</h1>
+            <p class="tagline">Compare PC hardware prices</p>
+        </header>
+
+        <form method="POST" class="compare-form" id="compare-form">
+            <div class="compare-inputs">
+                <input
+                    type="text"
+                    name="query_a"
+                    placeholder="First part (e.g. RTX 4070)"
+                    value="{{ query_a }}"
+                    autocomplete="off"
+                >
+                <span class="vs-label">VS</span>
+                <input
+                    type="text"
+                    name="query_b"
+                    placeholder="Second part (e.g. RX 7800 XT)"
+                    value="{{ query_b }}"
+                    autocomplete="off"
+                >
+            </div>
+            <button type="submit">Compare</button>
+        </form>
+
+        {% if winner %}
+            <div class="winner-banner {% if winner == 'tie' %}tie{% endif %}">
+                {% if winner == "a" %}
+                    ✓ {{ query_a | upper }} has the lower average price
+                {% elif winner == "b" %}
+                    ✓ {{ query_b | upper }} has the lower average price
+                {% else %}
+                    Both parts have the same average price
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <div class="compare-grid">
+
+            <!-- Part A -->
+            <div class="compare-col {% if winner == 'a' %}winner-col{% endif %}">
+                {% if result_a.error %}
+                    <div class="card error-card">
+                        <p>⚠ {{ result_a.error }}</p>
+                    </div>
+                {% elif result_a.listings %}
+                    <div class="card results-card">
+                        <h2>{{ query_a | upper }}</h2>
+
+                        <div class="trend-indicator {{ result_a.trend }}">
+                            {% if result_a.trend == "up" %}
+                                ↑ Prices trending up
+                            {% elif result_a.trend == "down" %}
+                                ↓ Prices trending down
+                            {% else %}
+                                → Prices are stable
+                            {% endif %}
+                        </div>
+
+                        <div class="stats-row">
+                            <div class="stat-box">
+                                <span class="stat-label">Average</span>
+                                <span class="stat-value">${{ result_a.avg }}</span>
+                            </div>
+                            <div class="stat-box low">
+                                <span class="stat-label">Lowest</span>
+                                <span class="stat-value">${{ result_a.low }}</span>
+                            </div>
+                            <div class="stat-box high">
+                                <span class="stat-label">Highest</span>
+                                <span class="stat-value">${{ result_a.high }}</span>
+                            </div>
+                        </div>
+
+                        <ul class="price-list">
+                            {% for listing in result_a.listings %}
+                                <li>
+                                    <a href="{{ listing.url }}" target="_blank" class="listing-title">
+                                        {{ listing.title | truncate(40) }}
+                                    </a>
+                                    <div class="listing-bottom">
+                                        <span class="listing-price">${{ listing.price }}</span>
+                                        <span class="deal-badge {{ listing.label | lower | replace(' ', '-') }}">
+                                            {{ listing.label }}
+                                        </span>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Part B -->
+            <div class="compare-col {% if winner == 'b' %}winner-col{% endif %}">
+                {% if result_b.error %}
+                    <div class="card error-card">
+                        <p>⚠ {{ result_b.error }}</p>
+                    </div>
+                {% elif result_b.listings %}
+                    <div class="card results-card">
+                        <h2>{{ query_b | upper }}</h2>
+
+                        <div class="trend-indicator {{ result_b.trend }}">
+                            {% if result_b.trend == "up" %}
+                                ↑ Prices trending up
+                            {% elif result_b.trend == "down" %}
+                                ↓ Prices trending down
+                            {% else %}
+                                → Prices are stable
+                            {% endif %}
+                        </div>
+
+                        <div class="stats-row">
+                            <div class="stat-box">
+                                <span class="stat-label">Average</span>
+                                <span class="stat-value">${{ result_b.avg }}</span>
+                            </div>
+                            <div class="stat-box low">
+                                <span class="stat-label">Lowest</span>
+                                <span class="stat-value">${{ result_b.low }}</span>
+                            </div>
+                            <div class="stat-box high">
+                                <span class="stat-label">Highest</span>
+                                <span class="stat-value">${{ result_b.high }}</span>
+                            </div>
+                        </div>
+
+                        <ul class="price-list">
+                            {% for listing in result_b.listings %}
+                                <li>
+                                    <a href="{{ listing.url }}" target="_blank" class="listing-title">
+                                        {{ listing.title | truncate(40) }}
+                                    </a>
+                                    <div class="listing-bottom">
+                                        <span class="listing-price">${{ listing.price }}</span>
+                                        <span class="deal-badge {{ listing.label | lower | replace(' ', '-') }}">
+                                            {{ listing.label }}
+                                        </span>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('compare-form').addEventListener('submit', function() {
+            document.querySelector('button[type="submit"]').disabled = true;
+            document.querySelector('button[type="submit"]').textContent = 'Comparing...';
+        });
+    </script>
+</body>
+</html>

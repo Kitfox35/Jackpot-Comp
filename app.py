@@ -123,6 +123,44 @@ def home():
 
     return render_template("index.html", result=result, query=query, history=session["history"])
 
+@app.route("/compare", methods=["GET", "POST"])
+def compare():
+    result_a = {}
+    result_b = {}
+    query_a = {}
+    query_b = {}
+    winner = None
+
+    if request.method == "POST":
+        query_a = request.form.get("query_a", "").strip()
+        query_b = request.form.get("query_b", "").strip()
+
+        if query_a:
+            result_a = get_price_data(query_a)
+        if query_b:
+            result_b = get_price_data(query_b)
+
+        if result_a.get("avg") and result_b.get("avg"):
+            if result_a["avg"] < result_b["avg"]:
+                winner = "a"
+            elif result_b["avg"] < result_a["avg"]:
+                winner = "b"
+            else:
+                winner = "tie"
+    return render_template("compare.html",
+        result_a=result_a, result_b=result_b,
+        query_a=query_a, query_b=query_b,
+        winner=winner
+    )
+
+
+
+
+
+
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)
     
