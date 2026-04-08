@@ -54,30 +54,32 @@ def get_price_data(query):
     # Try real API first, fall back to hardcoded data
     api_results = search_prices(query)
 
-    if api_results:
-        prices = [item["price"] for item in api_results]
-    else:
-        prices = HARDWARE_PRICES.get(query)
-
-    # Case 3: no match found — show suggestions
-    if prices is None:
-        suggestions = [k.upper() for k in HARDWARE_PRICES.keys()]
-        suggestions_str = ", ".join(suggestions)
-        return {"error": f'No results for "{query.upper()}". Available parts: {suggestions_str}'}
-    
-    avg =round(sum(prices) / len (prices), 2)
+# Build labeled listings
+    listings = []
+    prices = [item["price"] for item in api_results]
+    avg = round(sum(prices) / len(prices), 2)
     low = min(prices)
     high = max(prices)
-    # Build labeled listings
-    listings = []
-    for price in prices :
+    trend = get_trend(prices)
+    
+    for item in api_results :
+        price = item["price"]
         if price < avg:
             label = "Good Deal"
         elif price > avg:
             label = "Overpriced"
         else:
-            lavel = "Fair"
-        listings.append({"price": price, "label": label})
+            label = "Fair"
+        listings.append({
+        "price": price,
+        "label": label,
+        "title": item.get("title", "Unknown"),
+        "url": item.get("url", "#")
+    })
+
+
+
+
 
 
     trend = get_trend(prices)

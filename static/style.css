@@ -12,9 +12,10 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
+    align-items: center;
+    justify-content: flex-start;
     padding: 60px 16px;
+    margin: 0;
 }
 
 /* --- Layout --- */
@@ -110,6 +111,7 @@ button:hover {
 
 /* --- Results --- */
 .results-card h2 {
+    text-align: left;
     font-size: 1.1rem;
     color: #94a3b8;
     margin-bottom: 16px;
@@ -133,26 +135,45 @@ button:hover {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 
 .price-list li {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
     align-items: center;
-    padding: 12px 16px;
+    gap: 12px;
+    padding: 10px 14px;
     background: #0f172a;
     border-radius: 8px;
 }
 
 .listing-label {
     color: #64748b;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    text-decoration: none;
+    white-space: hidden;
+    text-overflow: ellipsis;
+}
+
+.listing-title {
+    color: #94a3b8 !important;
+    font-size: 0.85rem;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.listing-title:hover {
+    color: #f1f5f9 !important;
+    text-decoration: underline;
 }
 
 .listing-price {
     font-weight: 600;
     color: #e2e8f0;
+    white-space: nowrap;
 }
 
 /* --- Stats Row --- */
@@ -389,4 +410,11 @@ input[type="text"]:focus::placeholder {
 
 .calc-result.negative span {
     font-weight: 700;
+}
+
+.avg-compare {
+    text-align: center;
+    font-size: 0.85rem;
+    margin-top: 12px;
+    min-height: 20px;
 }

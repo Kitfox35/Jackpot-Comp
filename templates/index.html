@@ -83,18 +83,28 @@
                 <ul class="price-list">
                     {% for listing in result.listings %}
                         <li>
-                            <span class="listing-label">Listing {{ loop.index }}</span>
-                            <span class="listing-price">${{ listing.price }}</span>
-                            <span class="deal-badge {{ listing.label | lower | replace(' ', '-') }}">
-                                {{ listing.label }}
-                            </span>
+                           <a href="{{ listing.url}}" target="_blank" class="listing-title">
+                                {{ listing.title | truncate(50) }}
+                           </a>
+                           <div class="listing-bottom">
+                                <span class="listing-price">${{ listing.price }}</span>
+                                <span class="deal-badge {{ listing.label | lower | replace(' ', '-') }}">
+                                    {{ listing.label }}
+                                </span>
+                           </div>
                         </li>
                     {% endfor %}
                 </ul>
             </div>
         {% endif %}
 
-        <div class="card calc-card">
+        <div class="card calc-card" data-avg="{{ result.avg | default(0) }}" data-low="{{ result.low | default(0) }}" data-high="{{ result.high | default(0) }}">
+            
+            
+            
+            
+            
+            
             <h2 class="calc-title">Profit Calculator</h2>
             <div class="calc-row">
                 <div class="calc-field">
@@ -109,54 +119,72 @@
             <div class="calc-result" id="calc-result">
                 Enter buy and sell prices above
             </div>
-        </div>
+            <div class="avg-compare" id="avg-compare"></div>
+</div>
 
     </div>
 
     <script>
-        // --- Loading bar ---
-        document.getElementById('search-form').addEventListener('submit', function() {
-            document.getElementById('loader').classList.add('active');
-            document.querySelector('button[type="submit"]').disabled = true;
-            document.querySelector('button[type="submit"]').textContent = 'Searching...';
-        });
+    const resultAvg = parseFloat(document.querySelector('.calc-card').dataset.avg) || 0;
 
-        // --- Profit Calculator ---
-        const buyInput = document.getElementById('buy-price');
-        const sellInput = document.getElementById('sell-price');
-        const calcResult = document.getElementById('calc-result');
+    // --- Loading bar ---
+    document.getElementById('search-form').addEventListener('submit', function() {
+        document.getElementById('loader').classList.add('active');
+        document.querySelector('button[type="submit"]').disabled = true;
+        document.querySelector('button[type="submit"]').textContent = 'Searching...';
+    });
 
-        function updateCalc() {
-            if (!buyInput || !sellInput || !calcResult) return;
+    // --- Profit Calculator ---
+    const buyInput = document.getElementById('buy-price');
+    const sellInput = document.getElementById('sell-price');
+    const calcResult = document.getElementById('calc-result');
 
-            const buy = parseFloat(buyInput.value);
-            const sell = parseFloat(sellInput.value);
+    function updateCalc() {
+        if (!buyInput || !sellInput || !calcResult) return;
 
-            if (isNaN(buy) || isNaN(sell)) {
-                calcResult.textContent = 'Enter buy and sell prices above';
-                calcResult.className = 'calc-result';
-                return;
-            }
+        const buy = parseFloat(buyInput.value);
+        const sell = parseFloat(sellInput.value);
 
-            const profit = sell - buy;
-            const percent = ((profit / buy) * 100).toFixed(1);
+        if (isNaN(buy) || isNaN(sell)) {
+            calcResult.textContent = 'Enter buy and sell prices above';
+            calcResult.className = 'calc-result';
+            return;
+        }
 
-            if (profit > 0) {
-                calcResult.innerHTML = `Profit: <span>+$${profit.toFixed(2)}</span> (${percent}%)`;
-                calcResult.className = 'calc-result positive';
-            } else if (profit < 0) {
-                calcResult.innerHTML = `Loss: <span>-$${Math.abs(profit).toFixed(2)}</span> (${percent}%)`;
-                calcResult.className = 'calc-result negative';
+        const profit = sell - buy;
+        const percent = ((profit / buy) * 100).toFixed(1);
+
+        if (profit > 0) {
+            calcResult.innerHTML = `Profit: <span>+$${profit.toFixed(2)}</span> (${percent}%)`;
+            calcResult.className = 'calc-result positive';
+        } else if (profit < 0) {
+            calcResult.innerHTML = `Loss: <span>-$${Math.abs(profit).toFixed(2)}</span> (${percent}%)`;
+            calcResult.className = 'calc-result negative';
+        } else {
+            calcResult.innerHTML = `Break even`;
+            calcResult.className = 'calc-result';
+        }
+
+        // Compare sell price to market average
+        const avgCompare = document.getElementById('avg-compare');
+        if (avgCompare && resultAvg > 0 && !isNaN(sell)) {
+            if (sell > resultAvg) {
+                avgCompare.textContent = `Sell price is $${(sell - resultAvg).toFixed(2)} above market average`;
+                avgCompare.className = 'avg-compare above';
+            } else if (sell < resultAvg) {
+                avgCompare.textContent = `Sell price is $${(resultAvg - sell).toFixed(2)} below market average`;
+                avgCompare.className = 'avg-compare below';
             } else {
-                calcResult.innerHTML = `Break even`;
-                calcResult.className = 'calc-result';
+                avgCompare.textContent = `Sell price matches market average`;
+                avgCompare.className = 'avg-compare equal';
             }
         }
+    }
 
-        if (buyInput && sellInput) {
-            buyInput.addEventListener('input', updateCalc);
-            sellInput.addEventListener('input', updateCalc);
-        }
-    </script>
+    if (buyInput && sellInput) {
+        buyInput.addEventListener('input', updateCalc);
+        sellInput.addEventListener('input', updateCalc);
+    }
+</script>
 </body>
 </html>
